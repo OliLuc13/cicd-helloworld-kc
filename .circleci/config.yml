@@ -1,3 +1,4 @@
+.
 version: 2.1
 
 defaults: &defaults
@@ -5,7 +6,8 @@ defaults: &defaults
   docker:
     - image: cimg/node:20.5.1
 
-
+orbs:
+  sonarcloud: sonarsource/sonarcloud@2.0.0
 
 jobs:
   test:
@@ -26,6 +28,7 @@ jobs:
       - run:
           name: Run tests
           command: npm run test:coverage
+      - sonarcloud/scan
       - save_cache:
           paths:
             - node_modules

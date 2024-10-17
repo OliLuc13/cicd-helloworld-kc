@@ -16,39 +16,28 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
 
       - run: npm install
-      
-      # Install sonar-scanner manually
-      - run:
-          name: Install Sonar Scanner
-          command: |
-            curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
-            unzip sonar-scanner.zip
-            export PATH=$PATH:$(pwd)/sonar-scanner-4.8.0.2856-linux/bin
-
       - run:
           name: Run lint
           command: npm run lint:report
       - run:
           name: Run tests
           command: npm run test:coverage
-      
-      # SonarCloud Scan using the manually installed sonar-scanner
-      - run:
+       - run:
           name: SonarCloud Scan
           command: |
             ./sonar-scanner-4.8.0.2856-linux/bin/sonar-scanner \
+              -Dsonar.host.url=https://sonarcloud.io \
               -Dsonar.organization=oliluc13 \
               -Dsonar.projectKey=OliLuc13_cicd-helloworld-kc \
               -Dsonar.sources=lib \
               -Dsonar.tests=tests \
               -Dsonar.eslint.reportPaths=lint.json \
               -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-
       - save_cache:
           paths:
             - node_modules
@@ -58,7 +47,6 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths: .
-
   deploy:
     <<: *defaults
     steps:

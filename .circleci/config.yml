@@ -16,9 +16,9 @@ jobs:
 
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
 
       - run: npm install
       - run:
@@ -27,7 +27,16 @@ jobs:
       - run:
           name: Run tests
           command: npm run test:coverage
-      - sonarcloud/scan
+      - run:
+          name: SonarCloud Scan
+          command: |
+            sonar-scanner \
+              -Dsonar.organization=oliluc13 \
+              -Dsonar.projectKey=OliLuc13_cicd-helloworld-kc \
+              -Dsonar.sources=lib \
+              -Dsonar.tests=tests \
+              -Dsonar.eslint.reportPaths=lint.json \
+              -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
       - save_cache:
           paths:
             - node_modules
@@ -37,6 +46,7 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths: .
+
   deploy:
     <<: *defaults
     steps:

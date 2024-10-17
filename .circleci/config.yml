@@ -22,14 +22,13 @@ jobs:
 
       - run: npm install
       
-      # Install sonar-scanner
+      # Install sonar-scanner manually
       - run:
           name: Install Sonar Scanner
           command: |
-            wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+            curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
             unzip sonar-scanner.zip
-            mv sonar-scanner-4.8.0.2856-linux sonar-scanner
-            export PATH=$PATH:$(pwd)/sonar-scanner/bin
+            export PATH=$PATH:$(pwd)/sonar-scanner-4.8.0.2856-linux/bin
 
       - run:
           name: Run lint
@@ -38,11 +37,11 @@ jobs:
           name: Run tests
           command: npm run test:coverage
       
-      # Run SonarCloud scan
+      # SonarCloud Scan using the manually installed sonar-scanner
       - run:
           name: SonarCloud Scan
           command: |
-            sonar-scanner \
+            ./sonar-scanner-4.8.0.2856-linux/bin/sonar-scanner \
               -Dsonar.organization=oliluc13 \
               -Dsonar.projectKey=OliLuc13_cicd-helloworld-kc \
               -Dsonar.sources=lib \
